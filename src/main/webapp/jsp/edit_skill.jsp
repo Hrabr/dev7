@@ -27,7 +27,7 @@
         </div>
      <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
                                                <div class="btn-group me-2" role="group" aria-label="Second group">
-                                                 <a href = "/developers?skills=<c:out value="${skillt}"/>" type="button" class="btn btn-primary">Back</a>
+                                                 <a href = "/developers?skills=<c:out value="${skills}"/>" type="button" class="btn btn-primary">Back</a>
 
                                               </div>
                                            </div>
@@ -71,7 +71,7 @@
 
           <div class="form-group row">
             <div class="col-sm-10">
-              <button type="submit" class="btn btn-warning">Sign in</button>
+              <button type="submit" class="btn btn-warning">Edit</button>
               <h2>${Save}</h2>
 
             </div>

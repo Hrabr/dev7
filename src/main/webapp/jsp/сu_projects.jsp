@@ -10,9 +10,7 @@
 <jsp:include page = "navigators.jsp"/>
 
 <div class="container">
-<form action="/customers" method="post">
     <div class="row">
-
         <div style="margin: 10px">
               <c:choose>
                              <c:when test = "${Name !=null}">
@@ -23,30 +21,29 @@
                                       </c:otherwise>
                                       </c:choose>
         </div>
-
         <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
                  <div class="btn-group me-2" role="group" aria-label="Second group">
-                          <a href = "/customers?projects=<c:out value="${Back}"/>" type="button" class="btn btn-primary">Back</a>
-                           <a href = "" type="reset" class="btn btn-success">Reset</a>
+                          <a href = "/customers" type="button" class="btn btn-primary">Back</a>
+                          <a href = "/customers/Back?new=<c:out value="${Back}"/>" type="button" class="btn btn-success">New</a>
                  </div>
         </div>
-         <input type="hidden"  value="<c:out value="${Back}"/>"   name="CustomerId">
+
         <table class="table">
             <thead>
             <tr>
-            <th scope="col">Choose</th>
+
                 <th scope="col">ID</th>
                 <th scope="col">Name</th>
                 <th scope="col">Start project</th>
                <th scope="col">Cost project</th>
-
+                <th scope="col">Action</th>
             </tr>
             </thead>
             <tbody>
              <tr>
 
             <c:forEach items="${Projects}" var="p">
-          <td>  <input type="checkbox" name="projectId" value="${p.getId_projects()}"></td>
+
             <td> <c:out value="${p.getId_projects()}"/> </td>
            <td>  <c:out value="${p.getName_projects()}"/>  </td>
             <td>  <c:out value="${p.getStart_project()}"/> </td>
@@ -57,18 +54,18 @@
 
                 <td>
 
+                              <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+                                  <div class="btn-group me-2" role="group" aria-label="Second group">
 
+                                    <a href = "/customers/remove?id=<c:out value="${p.getId_projects()}"/>&back=<c:out value="${Back}"/>" type="button" class="btn btn-danger">Remove</a>
+                                 </div>
+                              </div>
+                      </td>
                 </tr>
               </c:forEach>
             </tbody>
         </table>
-        <div class="form-group row">
-                    <div class="col-sm-10">
-                      <button type="submit" class="btn btn-warning">Save</button>
-                    </div>
-                  </div>
     </div>
-     </form>
 </div>
 
 </body>

@@ -17,7 +17,8 @@ import java.util.List;
 @WebServlet("/developers/*")
 public class DevelopersServlet extends HttpServlet {
     private DevelopersService developersService;
-      String skills;
+    String skills;
+
     @Override
     public void init() throws ServletException {
         this.developersService = (DevelopersService) getServletContext().getAttribute("developersService");
@@ -27,7 +28,7 @@ public class DevelopersServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         List<DevelopersDto> all = developersService.getAll();
         req.setAttribute("developers", all);
-         skills = req.getParameter("skills");
+        skills = req.getParameter("skills");
         String projects = req.getParameter("projects");
         String Edit = req.getParameter("Edit");
         String remove = req.getParameter("Remove");
@@ -38,10 +39,10 @@ public class DevelopersServlet extends HttpServlet {
             req.getRequestDispatcher("/jsp/developers.jsp").forward(req, resp);
         } else if (skills != null) {
 
-            int i = Integer.parseInt(skills);
+            int skillsId = Integer.parseInt(skills);
             for (DevelopersDto list : all) {
-                if (i == list.getId_developers()) {
-                    req.setAttribute("i",i);
+                if (skillsId == list.getId_developers()) {
+                    req.setAttribute("skillsId", skillsId);
                     req.setAttribute("Skills", list.getSkillDto());
                     req.setAttribute("Name", list);
                     req.setAttribute("Back", "developers");
@@ -49,10 +50,10 @@ public class DevelopersServlet extends HttpServlet {
                 }
             }
         } else if (projects != null) {
-            int i = Integer.parseInt(projects);
+            int projectId = Integer.parseInt(projects);
             for (DevelopersDto list : all) {
-                if (i == list.getId_developers()) {
-                    req.setAttribute("i",i);
+                if (projectId == list.getId_developers()) {
+                    req.setAttribute("projectId", projectId);
                     req.setAttribute("Projects", list.getProjectsDto());
                     req.setAttribute("Name", list);
                     req.setAttribute("Back", "developers");
@@ -60,18 +61,18 @@ public class DevelopersServlet extends HttpServlet {
                 }
             }
         } else if (Edit != null) {
-            int i = Integer.parseInt(Edit);
+            int editId = Integer.parseInt(Edit);
             for (DevelopersDto list : all) {
-                if (i == list.getId_developers()) {
+                if (editId == list.getId_developers()) {
                     req.setAttribute("Developers", list);
                     req.getRequestDispatcher("/jsp/edit_developers.jsp").forward(req, resp);
                 }
             }
-        }else if(contextPath.equals("/developers/remove")){
-developersService.deleteDeveloper(remove);
-            List<DevelopersDto> all1 = developersService.getAll();
-            req.setAttribute("developers", all1);
-req.getRequestDispatcher("/jsp/developers.jsp").forward(req,resp);
+        } else if (contextPath.equals("/developers/remove")) {
+            developersService.deleteDeveloper(remove);
+            List<DevelopersDto> allDeveloperDto = developersService.getAll();
+            req.setAttribute("developers", allDeveloperDto);
+            req.getRequestDispatcher("/jsp/developers.jsp").forward(req, resp);
         }
     }
 
@@ -94,15 +95,15 @@ req.getRequestDispatcher("/jsp/developers.jsp").forward(req,resp);
                 req.setAttribute("Save", "Developer not save");
             }
             req.getRequestDispatcher("/jsp/new_developers.jsp").forward(req, resp);
-        }else{
+        } else {
             developersDao.setId_developers(Integer.parseInt(req.getParameter("developersId")));
             int update = developersService.update(developersDao);
             if (update != 0) {
                 DevelopersDto dto = developersService.get(update);
                 req.setAttribute("Developers", dto);
-                req.setAttribute("Save", "Developer update");
+                req.setAttribute("Save", "Developer edited");
             } else {
-                req.setAttribute("Save", "Developer not save");
+                req.setAttribute("Save", "Developer not edited");
             }
             req.getRequestDispatcher("/jsp/edit_developers.jsp").forward(req, resp);
         }

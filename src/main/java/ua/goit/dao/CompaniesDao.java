@@ -10,9 +10,9 @@ import java.util.List;
 @Getter
 @Setter
 public class CompaniesDao {
-  private int id_companies;
-  private String name_companies;
-  private String country_companies;
-private List<ProjectsDao> projectsDao;
+    private int id_companies;
+    private String name_companies;
+    private String country_companies;
+    private List<ProjectsDao> projectsDao;
 
 }

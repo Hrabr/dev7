@@ -10,13 +10,15 @@ public class ConverterCompanies {
         return CompaniesDao.builder().id_companies(dto.getId_companies()).name_companies(dto.getName_companies())
                 .country_companies(dto.getCountry_companies()).build();
     }
+
     public CompaniesDto from(CompaniesDao dao) {
-        ConverterProjects converterProjects=new ConverterProjects();
+        ConverterProjects converterProjects = new ConverterProjects();
         return CompaniesDto.builder().id_companies(dao.getId_companies()).name_companies(dao.getName_companies())
-                .country_companies(dao.getCountry_companies()).projectsDto(dao.getProjectsDao().stream().map(p->converterProjects.from(p))
+                .country_companies(dao.getCountry_companies()).projectsDto(dao.getProjectsDao().stream().map(p -> converterProjects.from(p))
                         .collect(Collectors.toList())).build();
     }
-    public CompaniesDto fromt(CompaniesDao dao){
+
+    public CompaniesDto fromWithoutProjects(CompaniesDao dao) {
         return CompaniesDto.builder().id_companies(dao.getId_companies()).name_companies(dao.getName_companies())
                 .country_companies(dao.getCountry_companies()).build();
     }

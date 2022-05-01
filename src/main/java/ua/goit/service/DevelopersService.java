@@ -24,8 +24,8 @@ public class DevelopersService {
     PostgresHikariProvider postgresHikariProvider;
     private final String SAVE_DEVELOPER = "INSERT INTO developers (name,age,gender,salary) VALUES (?,?,?,?);";
     private final String UPDATE_DEVELOPERS = "UPDATE developers SET name=?,age=?,gender=?,salary=? WHERE id_developers=?;";
-    private final String GET_DEVELOPER="SELECT * FROM developers WHERE id_developers=?";
-    private final String DELETE_DEVELOPER="DELETE FROM developers WHERE id_developers=?;";
+    private final String GET_DEVELOPER = "SELECT * FROM developers WHERE id_developers=?";
+    private final String DELETE_DEVELOPER = "DELETE FROM developers WHERE id_developers=?;";
 
     public DevelopersService() {
         developersCommand = new DevelopersCommand();
@@ -94,12 +94,13 @@ public class DevelopersService {
         });
         while (withPreparedStatement.next()) {
             DevelopersDao dao = developersCommand.mapToEntity(withPreparedStatement);
-           return converterDevelopers.fromt(dao);
+            return converterDevelopers.fromWithoutProjects(dao);
         }
         return null;
     }
-    public int deleteDeveloper(String developer){
-         int developerId = Integer.parseInt(developer);
+
+    public int deleteDeveloper(String developer) {
+        int developerId = Integer.parseInt(developer);
         return dbHelper.executeWithPreparedStatement(DELETE_DEVELOPER, ps -> {
 
             try {

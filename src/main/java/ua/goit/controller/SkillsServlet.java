@@ -38,7 +38,7 @@ public class SkillsServlet extends HttpServlet {
             Integer integer = Integer.valueOf(edit);
             for (SkillDto dto : all) {
                 if (integer.equals(dto.getId_skill())) {
-                    req.setAttribute("skillt", skills);
+                    req.setAttribute("skills", skills);
                     req.setAttribute("SkillDto", dto);
                     req.getRequestDispatcher("/jsp/edit_skill.jsp").forward(req, resp);
                 }
@@ -64,8 +64,8 @@ public class SkillsServlet extends HttpServlet {
         if (requestURI.equals("/skill/new")) {
             Integer id = Integer.parseInt(id1);
             Integer save = skillsService.save(build);
-            int i = skillsService.saveDevelopersSkill(id, save);
-            if (save != null && i != 0) {
+            int saveId = skillsService.saveDevelopersSkill(id, save);
+            if (save != null && saveId != 0) {
                 req.setAttribute("Save", "Skill saved");
                 req.setAttribute("In", id1);
             } else {
@@ -78,10 +78,10 @@ public class SkillsServlet extends HttpServlet {
             if (update != 0) {
                 SkillDto skillDto = skillsService.get(update);
                 req.setAttribute("SkillDto", skillDto);
-                req.setAttribute("skillt", skills);
-                req.setAttribute("Save", "Skill saved");
+                req.setAttribute("skills", skills);
+                req.setAttribute("Save", "Skill edited");
             } else {
-                req.setAttribute("Save", "Skill not save");
+                req.setAttribute("Save", "Skill not edited");
             }
             req.getRequestDispatcher("/jsp/edit_skill.jsp").forward(req, resp);
         }

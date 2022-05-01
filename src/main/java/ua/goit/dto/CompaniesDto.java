@@ -10,10 +10,10 @@ import java.util.List;
 @Getter
 @Setter
 public class CompaniesDto {
-  private int id_companies;
-  private String name_companies;
-  private String country_companies;
-  private List<ProjectsDto> projectsDto;
+    private int id_companies;
+    private String name_companies;
+    private String country_companies;
+    private List<ProjectsDto> projectsDto;
 
 
 }

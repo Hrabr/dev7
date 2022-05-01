@@ -37,11 +37,11 @@ public class CustomersServlet extends HttpServlet {
             String id = req.getParameter("id");
             String back = req.getParameter("back");
             int integer = Integer.parseInt(id);
-            int i = customersService.saveNullProject(integer);
+            customersService.saveNullProject(integer);
             req.getRequestDispatcher("/customers?projects=" + back).forward(req, resp);
         } else if (requestURI.equals("/customers/New")) {
             req.getRequestDispatcher("/jsp/new_customers.jsp").forward(req, resp);
-        } else if (requestURI.equals("/customers/new")) {
+        } else if (requestURI.equals("/customers/Back")) {
             List<ProjectsDto> project = customersService.getProject();
             String aNew = req.getParameter("new");
             req.setAttribute("Projects", project);
@@ -50,19 +50,19 @@ public class CustomersServlet extends HttpServlet {
         } else if (projects == null && remove == null && edit == null) {
             req.getRequestDispatcher("/jsp/customers.jsp").forward(req, resp);
         } else if (projects != null && remove == null) {
-            int i = Integer.parseInt(projects);
+            int projectBack = Integer.parseInt(projects);
             for (CustomersDto cuD : all) {
-                if (i == cuD.getId_customers()) {
+                if (projectBack == cuD.getId_customers()) {
                     req.setAttribute("Projects", cuD.getProjectsDto());
                     req.setAttribute("Name", cuD.getName_customers());
-                    req.setAttribute("Back", i);
-                    req.getRequestDispatcher("/jsp/с_projects.jsp").forward(req, resp);
+                    req.setAttribute("Back", projectBack);
+                    req.getRequestDispatcher("/jsp/сu_projects.jsp").forward(req, resp);
                 }
             }
         } else if (remove != null) {
-            int remove1 = customersService.remove(remove);
-            List<CustomersDto> all1 = customersService.getAll();
-            req.setAttribute("Customers", all1);
+            customersService.remove(remove);
+            List<CustomersDto> allCustomersDto = customersService.getAll();
+            req.setAttribute("Customers", allCustomersDto);
             req.getRequestDispatcher("/jsp/customers.jsp").forward(req, resp);
         } else if (edit != null) {
             for (CustomersDto dto : all) {
@@ -79,48 +79,48 @@ public class CustomersServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String customerId1 = req.getParameter("CustomerId");
         String customerId2 = req.getParameter("customerId");
-        String projectIds= req.getParameter("projectId");
+        String projectIds = req.getParameter("projectId");
         CustomersDto build = CustomersDto.builder().name_customers(req.getParameter("Name_customer"))
                 .country_customers(req.getParameter("Country_customer")).build();
-        if(build!=null&&customerId2==null&&projectIds==null){
+        if (build != null && customerId2 == null && projectIds == null) {
             int save = customersService.save(build);
-            if(save!=0){
-                req.setAttribute("Save","Customer save");
-                req.getRequestDispatcher("/jsp/new_customers.jsp").forward(req,resp);
-            }else{
-                req.setAttribute("Save","Customer not save");
-                req.getRequestDispatcher("/jsp/new_customers.jsp").forward(req,resp);
+            if (save != 0) {
+                req.setAttribute("Save", "Customer save");
+                req.getRequestDispatcher("/jsp/new_customers.jsp").forward(req, resp);
+            } else {
+                req.setAttribute("Save", "Customer not save");
+                req.getRequestDispatcher("/jsp/new_customers.jsp").forward(req, resp);
             }
 
-        }else if(projectIds==null&&build==null){
+        } else if (projectIds == null && build == null) {
             List<ProjectsDto> project = customersService.getProject();
-            req.setAttribute("Projects",project);
-            req.setAttribute("Back",customerId1);
-            req.getRequestDispatcher("/jsp/customer_new_projects.jsp").forward(req,resp);
-        }else if(customerId2!=null){
+            req.setAttribute("Projects", project);
+            req.setAttribute("Back", customerId1);
+            req.getRequestDispatcher("/jsp/customer_new_projects.jsp").forward(req, resp);
+        } else if (customerId2 != null) {
             assert build != null;
             build.setId_customers(Integer.parseInt(customerId2));
             int update = customersService.update(build);
             if (update != 0) {
                 CustomersDto dto = customersService.get(update);
                 req.setAttribute("customer", dto);
-                req.setAttribute("Save", "Customer update");
+                req.setAttribute("Save", "Customer edited");
             } else {
-                req.setAttribute("Save", "Customer not update");
+                req.setAttribute("Save", "Customer not edited");
             }
             req.getRequestDispatcher("/jsp/edit_customers.jsp").forward(req, resp);
 
-        }
-        else {
+        } else {
             Integer customerId = Integer.parseInt(customerId1);
             Set<Integer> projectId = Arrays.stream(req.getParameterValues("projectId"))
                     .map(Integer::parseInt)
                     .collect(Collectors.toSet());
-            projectId.stream().forEach(p-> customersService.saveCustomersProject(p, customerId));
+            projectId.stream().forEach(p -> customersService.saveCustomersProject(p, customerId));
             List<ProjectsDto> project = customersService.getProject();
-            req.setAttribute("Projects",project);
-            req.setAttribute("Back",customerId1);
-            req.getRequestDispatcher("/jsp/customer_new_projects.jsp").forward(req,resp);}
+            req.setAttribute("Projects", project);
+            req.setAttribute("Back", customerId1);
+            req.getRequestDispatcher("/jsp/customer_new_projects.jsp").forward(req, resp);
+        }
     }
 
 }

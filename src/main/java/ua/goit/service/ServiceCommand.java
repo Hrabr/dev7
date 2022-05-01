@@ -122,7 +122,7 @@ public abstract class ServiceCommand<T> {
 
     public List<T> getProjectNull(String string) {
         List<T> resultList = new ArrayList<>();
-        String query = String.format("select * from %s where %s is Null ", getTableName(),string);
+        String query = String.format("select * from %s where %s is Null ", getTableName(), string);
         try {
             ResultSet resultSet = dbHelper.getWithPreparedStatement(
                     query, ps -> {

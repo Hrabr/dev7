@@ -24,7 +24,7 @@
         <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
                  <div class="btn-group me-2" role="group" aria-label="Second group">
                           <a href = "/companies" type="button" class="btn btn-primary">Back</a>
-                          <a href = "/companies/new?new=<c:out value="${Back}"/>" type="button" class="btn btn-success">New</a>
+                          <a href = "/companies/Back?new=<c:out value="${Back}"/>" type="button" class="btn btn-success">New</a>
                  </div>
         </div>
 

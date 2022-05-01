@@ -21,7 +21,8 @@ public class ProjectsService {
     private final String UPDATE_PROJECT = "UPDATE projects SET name_projects=?,cost_project=?,start_project=? WHERE id_projects=?";
     private final String GET_PROJECT = "SELECT * FROM projects WHERE id_projects=?";
     private final String DELETE_PROJECT = "DELETE FROM projects WHERE id_projects=?;";
-private final String DELETE_DEVELOPER_PROJECT="DELETE FROM developers_projects WHERE developer_id=? AND projects_id=?;";
+    private final String DELETE_DEVELOPER_PROJECT = "DELETE FROM developers_projects WHERE developer_id=? AND projects_id=?;";
+
     public ProjectsService() {
         converterProjects = new ConverterProjects();
         projectsCommand = new ProjectsCommand();
@@ -104,9 +105,10 @@ private final String DELETE_DEVELOPER_PROJECT="DELETE FROM developers_projects W
             }
         });
     }
-    public int deleteDeveloperProject(String developer, String project){
-         int developerId = Integer.parseInt(developer);
-         int projectId = Integer.parseInt(project);
+
+    public int deleteDeveloperProject(String developer, String project) {
+        int developerId = Integer.parseInt(developer);
+        int projectId = Integer.parseInt(project);
         return dbHelper.executeWithPreparedStatement(DELETE_DEVELOPER_PROJECT, ps -> {
 
             try {

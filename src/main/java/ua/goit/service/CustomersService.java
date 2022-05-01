@@ -27,6 +27,7 @@ public class CustomersService {
     private final String DELETE_CUSTOMER = "DELETE FROM customers WHERE id_customers=?;";
     private final String UPDATE_DEVELOPERS = "UPDATE customers SET name_customers=?,country_customers=? WHERE id_customers=?";
     private final String GET_CUSTOMERS = "SELECT * FROM customers WHERE id_customers=?";
+
     public CustomersService() {
         this.converterCustomer = new ConverterCustomer();
         this.customersCommand = new CustomersCommand();
@@ -59,6 +60,7 @@ public class CustomersService {
             }
         });
     }
+
     public int saveNullProject(int project) {
         return dbHelper.executeWithPreparedStatement(SAVE_NULL_TO_PROJECT, ps -> {
             try {
@@ -68,6 +70,7 @@ public class CustomersService {
             }
         });
     }
+
     public int save(CustomersDto dto) {
         CustomersDao dao = converterCustomer.to(dto);
         return dbHelper.getWithPreparedStatementWithId(SAVE, ps -> {
@@ -79,6 +82,7 @@ public class CustomersService {
             }
         });
     }
+
     public int remove(String id) {
         int number = Integer.parseInt(id);
 
@@ -92,6 +96,7 @@ public class CustomersService {
             }
         });
     }
+
     public Integer update(CustomersDto dto) {
         CustomersDao dao = converterCustomer.to(dto);
         return dbHelper.getWithPreparedStatementWithId(UPDATE_DEVELOPERS, ps -> {
@@ -107,6 +112,7 @@ public class CustomersService {
 
         });
     }
+
     @SneakyThrows
     public CustomersDto get(int i) {
         ResultSet withPreparedStatement = dbHelper.getWithPreparedStatement(GET_CUSTOMERS, ps -> {
@@ -121,7 +127,7 @@ public class CustomersService {
         });
         while (withPreparedStatement.next()) {
             CustomersDao dao = customersCommand.mapToEntity(withPreparedStatement);
-            return converterCustomer.fromt(dao);
+            return converterCustomer.fromWithoutProjects(dao);
         }
         return null;
     }

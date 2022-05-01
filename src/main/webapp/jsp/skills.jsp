@@ -53,8 +53,8 @@
 
                               <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
                                   <div class="btn-group me-2" role="group" aria-label="Second group">
-                                    <a href = "/skill/edit?skills=<c:out value="${i}"/>&edit=<c:out value="${s.getId_skill()}"/>" type="button" class="btn btn-warning">Edit</a>
-                                    <a href = "/skill/delete?skills=<c:out value="${i}"/>&delete=<c:out value="${s.getId_skill()}"/>" type="button" class="btn btn-danger">Remove</a>
+                                    <a href = "/skill/edit?skills=<c:out value="${skillsId}"/>&edit=<c:out value="${s.getId_skill()}"/>" type="button" class="btn btn-warning">Edit</a>
+                                    <a href = "/skill/delete?skills=<c:out value="${skillsId}"/>&delete=<c:out value="${s.getId_skill()}"/>" type="button" class="btn btn-danger">Remove</a>
                                  </div>
                               </div>
                       </td>

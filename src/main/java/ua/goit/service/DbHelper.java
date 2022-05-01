@@ -33,17 +33,18 @@ public class DbHelper {
             return ps.executeQuery();
         }
     }
-    public Integer getWithPreparedStatementWithId(String sql, Consumer<PreparedStatement> psCall)  {
+
+    public Integer getWithPreparedStatementWithId(String sql, Consumer<PreparedStatement> psCall) {
         try (Connection connection = postgresHikariProvider.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             psCall.accept(ps);
-             ps.execute();
-             ResultSet generatedKeys = ps.getGeneratedKeys();
+            ps.execute();
+            ResultSet generatedKeys = ps.getGeneratedKeys();
             if (generatedKeys.next()) {
-               return generatedKeys.getInt(1);
+                return generatedKeys.getInt(1);
             }
 
-        }catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return null;

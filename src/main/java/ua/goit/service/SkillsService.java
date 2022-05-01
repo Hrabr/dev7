@@ -15,12 +15,13 @@ public class SkillsService {
     private ConverterSkill converterSkill;
     private SkillCommand skillCommand;
     private DbHelper dbHelper;
-private final String SAVE_SKILL="INSERT INTO skill (language,level_skill) VALUES (?,?);";
-private final String SAVE_DEVELOPERS_SKILL="INSERT INTO developers_skill (developer_id,skill_id) VALUES(?,?);";
-private  final String GET_SKILL="SELECT * FROM skill WHERE id_skill=?";
-private final String UPDATE_SKILL="UPDATE skill SET language=?,level_skill=? WHERE id_skill=?;";
-private final String DELETE_SKILL="DELETE FROM skill WHERE id_skill=?;";
-private final String DELETE_DEVELOPER_SKILL ="DELETE FROM developers_skill WHERE developer_id=? AND skill_id=?;";
+    private final String SAVE_SKILL = "INSERT INTO skill (language,level_skill) VALUES (?,?);";
+    private final String SAVE_DEVELOPERS_SKILL = "INSERT INTO developers_skill (developer_id,skill_id) VALUES(?,?);";
+    private final String GET_SKILL = "SELECT * FROM skill WHERE id_skill=?";
+    private final String UPDATE_SKILL = "UPDATE skill SET language=?,level_skill=? WHERE id_skill=?;";
+    private final String DELETE_SKILL = "DELETE FROM skill WHERE id_skill=?;";
+    private final String DELETE_DEVELOPER_SKILL = "DELETE FROM developers_skill WHERE developer_id=? AND skill_id=?;";
+
     public SkillsService() {
         this.skillCommand = new SkillCommand();
         this.converterSkill = new ConverterSkill();
@@ -34,24 +35,28 @@ private final String DELETE_DEVELOPER_SKILL ="DELETE FROM developers_skill WHERE
 
     public Integer save(SkillDto dto) {
         SkillDao dao = converterSkill.to(dto);
-        return dbHelper.getWithPreparedStatementWithId(SAVE_SKILL,ps->{
+        return dbHelper.getWithPreparedStatementWithId(SAVE_SKILL, ps -> {
             try {
                 ps.setString(1, dao.getLanguage());
                 ps.setString(2, dao.getLevel_skill());
-            }catch (SQLException e){
-                e.printStackTrace();}
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         });
     }
-    public int saveDevelopersSkill(Integer idDev,Integer idSkill){
-        return dbHelper.executeWithPreparedStatement(SAVE_DEVELOPERS_SKILL,ps->{
+
+    public int saveDevelopersSkill(Integer idDev, Integer idSkill) {
+        return dbHelper.executeWithPreparedStatement(SAVE_DEVELOPERS_SKILL, ps -> {
             try {
                 ps.setInt(1, idDev);
                 ps.setInt(2, idSkill);
-            }catch (SQLException e){
-                e.printStackTrace();}
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         });
     }
-    public Integer update(SkillDto dto){
+
+    public Integer update(SkillDto dto) {
         SkillDao dao = converterSkill.to(dto);
         return dbHelper.getWithPreparedStatementWithId(UPDATE_SKILL, ps -> {
 
@@ -66,8 +71,9 @@ private final String DELETE_DEVELOPER_SKILL ="DELETE FROM developers_skill WHERE
 
         });
     }
+
     @SneakyThrows
-    public SkillDto get(int i){
+    public SkillDto get(int i) {
         ResultSet withPreparedStatement = dbHelper.getWithPreparedStatement(GET_SKILL, ps -> {
 
             try {
@@ -84,31 +90,33 @@ private final String DELETE_DEVELOPER_SKILL ="DELETE FROM developers_skill WHERE
         }
         return null;
     }
-public int deleteSkill(String skillId){
-    int number=Integer.parseInt(skillId);
 
-    return dbHelper.executeWithPreparedStatement(DELETE_SKILL, ps -> {
+    public int deleteSkill(String skillId) {
+        int number = Integer.parseInt(skillId);
 
-        try {
-            ps.setInt(1, number);
+        return dbHelper.executeWithPreparedStatement(DELETE_SKILL, ps -> {
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    });
-}
-public int deleteDeveloperSkill(String developer,String skill){
-     int developerId = Integer.parseInt(developer);
-     int skillId = Integer.parseInt(skill);
+            try {
+                ps.setInt(1, number);
 
-    return dbHelper.executeWithPreparedStatement(DELETE_DEVELOPER_SKILL, ps -> {
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        });
+    }
 
-        try {
-            ps.setInt(1, developerId);
-            ps.setInt(2, skillId);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    });
-}
+    public int deleteDeveloperSkill(String developer, String skill) {
+        int developerId = Integer.parseInt(developer);
+        int skillId = Integer.parseInt(skill);
+
+        return dbHelper.executeWithPreparedStatement(DELETE_DEVELOPER_SKILL, ps -> {
+
+            try {
+                ps.setInt(1, developerId);
+                ps.setInt(2, skillId);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        });
+    }
 }

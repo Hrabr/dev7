@@ -28,18 +28,18 @@ CREATE TABLE projects(
 	customers_id int ,
 	start_project date ,
 	cost_project decimal(15,0) NOT NULL,
-	FOREIGN KEY (companies_id) REFERENCES companies(id_companies),
-	FOREIGN KEY (customers_id) REFERENCES customers(id_customers)
+	FOREIGN KEY (companies_id) REFERENCES companies(id_companies) ON DELETE SET NULL,
+	FOREIGN KEY (customers_id) REFERENCES customers(id_customers) ON DELETE SET NULL
 );
 CREATE TABLE developers_projects(
-	developer_id int NOT NULL,
-	projects_id int NOT NULL,
-	FOREIGN KEY (developer_id) REFERENCES developers(id_developers),
+	developer_id int ,
+	projects_id int ,
+	FOREIGN KEY (developer_id) REFERENCES developers(id_developers) ON DELETE SET NULL,
 	FOREIGN KEY (projects_id) REFERENCES projects(id_projects)
 );
 CREATE TABLE developers_skill(
-	developer_id int NOT NULL,
-	skill_id int NOT NULL,
-	FOREIGN KEY (developer_id) REFERENCES developers(id_developers),
+	developer_id int ,
+	skill_id int ,
+	FOREIGN KEY (developer_id) REFERENCES developers(id_developers) ON DELETE SET NULL,
 	FOREIGN KEY (skill_id) REFERENCES skill(id_skill)
 );

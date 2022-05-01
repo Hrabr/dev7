@@ -127,7 +127,7 @@ public class CompaniesService {
         });
         while (withPreparedStatement.next()) {
             CompaniesDao dao = companiesCommand.mapToEntity(withPreparedStatement);
-            return converterCompanies.fromt(dao);
+            return converterCompanies.fromWithoutProjects(dao);
         }
         return null;
     }
