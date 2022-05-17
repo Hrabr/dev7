@@ -5,11 +5,16 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import ua.goit.base_service.DeveloperBase;
+import ua.goit.dao.DeveloperDao;
+import ua.goit.dao.SkillDao;
 import ua.goit.dto.SkillDto;
+import ua.goit.service.DeveloperService;
 import ua.goit.service.SkillsService;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @WebServlet("/skill/*")
 public class SkillsServlet extends HttpServlet {
@@ -32,9 +37,12 @@ public class SkillsServlet extends HttpServlet {
         skills = req.getParameter("skills");
         String requestURI = req.getRequestURI();
         if ("/skill/new".equals(requestURI)) {
+
             req.setAttribute("Id", userId);
             req.getRequestDispatcher("/jsp/new_skill.jsp").forward(req, resp);
+
         } else if ("/skill/edit".equals(requestURI)) {
+
             Integer integer = Integer.valueOf(edit);
             for (SkillDto dto : all) {
                 if (integer.equals(dto.getId_skill())) {
@@ -45,10 +53,14 @@ public class SkillsServlet extends HttpServlet {
             }
             req.getRequestDispatcher("/jsp/edit_skill.jsp").forward(req, resp);
         } else if ("/skill/delete".equals(requestURI)) {
+
             skills = req.getParameter("skills");
             delete = req.getParameter("delete");
-            skillsService.deleteDeveloperSkill(skills, delete);
-            skillsService.deleteSkill(delete);
+            int deletes = Integer.parseInt(delete);
+            Optional<SkillDao> skill = skillsService.get(deletes);
+            SkillDao skillDao = skill.get();
+            skillsService.delete(skillDao);
+
             req.getRequestDispatcher("/developers?skills=" + skills).forward(req, resp);
         }
         req.getRequestDispatcher("/jsp/skills.jsp").forward(req, resp);
@@ -57,33 +69,29 @@ public class SkillsServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        SkillDto build = SkillDto.builder().language(req.getParameter("language"))
-                .level_skill(req.getParameter("level")).build();
+
+        SkillDao build = SkillDao.builder()
+                .language(req.getParameter("language"))
+                .level_skill(req.getParameter("level"))
+                .build();
         String id1 = req.getParameter("Id");
+        String back = req.getParameter("back");
         String requestURI = req.getRequestURI();
         if (requestURI.equals("/skill/new")) {
+
             Integer id = Integer.parseInt(id1);
-            Integer save = skillsService.save(build);
-            int saveId = skillsService.saveDevelopersSkill(id, save);
-            if (save != null && saveId != 0) {
-                req.setAttribute("Save", "Skill saved");
-                req.setAttribute("In", id1);
-            } else {
-                req.setAttribute("Save", "Skill not save");
-            }
-            req.getRequestDispatcher("/jsp/new_skill.jsp").forward(req, resp);
+            DeveloperService developersService = new DeveloperService(new DeveloperBase());
+            Optional<DeveloperDao> developersDao = developersService.get(id);
+            DeveloperDao dao = developersDao.get();
+            skillsService.create(build, dao);
+            resp.sendRedirect("/developers?skills=" + id1);
+
         } else {
+
             build.setId_skill(Integer.parseInt(req.getParameter("skills")));
-            int update = skillsService.update(build);
-            if (update != 0) {
-                SkillDto skillDto = skillsService.get(update);
-                req.setAttribute("SkillDto", skillDto);
-                req.setAttribute("skills", skills);
-                req.setAttribute("Save", "Skill edited");
-            } else {
-                req.setAttribute("Save", "Skill not edited");
-            }
-            req.getRequestDispatcher("/jsp/edit_skill.jsp").forward(req, resp);
+            skillsService.updateSkill(build);
+            resp.sendRedirect("/developers?skills=" + back);
+
         }
     }
 }

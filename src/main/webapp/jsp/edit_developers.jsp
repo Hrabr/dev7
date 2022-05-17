@@ -8,7 +8,7 @@
 <body>
 
 <jsp:include page = "navigators.jsp"/>
-<% ua.goit.dto.DevelopersDto  developers = (ua.goit.dto.DevelopersDto) request.getAttribute("Developers");%>
+<% ua.goit.dto.DeveloperDto  developers = (ua.goit.dto.DeveloperDto) request.getAttribute("Developers");%>
 
 
 

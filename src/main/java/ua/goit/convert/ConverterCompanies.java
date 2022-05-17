@@ -1,25 +1,32 @@
 package ua.goit.convert;
 
-import ua.goit.dao.CompaniesDao;
-import ua.goit.dto.CompaniesDto;
+import ua.goit.dao.CompanyDao;
+import ua.goit.dto.CompanyDto;
 
 import java.util.stream.Collectors;
 
 public class ConverterCompanies {
-    public CompaniesDao to(CompaniesDto dto) {
-        return CompaniesDao.builder().id_companies(dto.getId_companies()).name_companies(dto.getName_companies())
-                .country_companies(dto.getCountry_companies()).build();
-    }
-
-    public CompaniesDto from(CompaniesDao dao) {
+    public CompanyDao to(CompanyDto dto) {
         ConverterProjects converterProjects = new ConverterProjects();
-        return CompaniesDto.builder().id_companies(dao.getId_companies()).name_companies(dao.getName_companies())
-                .country_companies(dao.getCountry_companies()).projectsDto(dao.getProjectsDao().stream().map(p -> converterProjects.from(p))
+        return CompanyDao.builder().
+                id(dto.getId_companies())
+                .name_companies(dto.getName_companies())
+                .country_companies(dto.getCountry_companies())
+                .projectsDao(dto.getProjectsDto().stream()
+                        .map(pi->converterProjects.to(pi))
                         .collect(Collectors.toList())).build();
     }
 
-    public CompaniesDto fromWithoutProjects(CompaniesDao dao) {
-        return CompaniesDto.builder().id_companies(dao.getId_companies()).name_companies(dao.getName_companies())
-                .country_companies(dao.getCountry_companies()).build();
+    public CompanyDto from(CompanyDao dao) {
+        ConverterProjects converterProjects = new ConverterProjects();
+        return CompanyDto.builder()
+                .id_companies(dao.getId())
+                .name_companies(dao.getName_companies())
+                .country_companies(dao.getCountry_companies())
+                .projectsDto(dao.getProjectsDao().stream()
+                        .map(p->converterProjects.from(p))
+                        .collect(Collectors.toList())).build();
     }
+
+
 }

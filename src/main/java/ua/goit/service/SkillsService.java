@@ -1,122 +1,58 @@
 package ua.goit.service;
 
-import lombok.SneakyThrows;
-import ua.goit.base_command.SkillCommand;
+
+import ua.goit.base_service.SkillBase;
 import ua.goit.convert.ConverterSkill;
+import ua.goit.dao.DeveloperDao;
 import ua.goit.dao.SkillDao;
 import ua.goit.dto.SkillDto;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class SkillsService {
-    private ConverterSkill converterSkill;
-    private SkillCommand skillCommand;
-    private DbHelper dbHelper;
-    private final String SAVE_SKILL = "INSERT INTO skill (language,level_skill) VALUES (?,?);";
-    private final String SAVE_DEVELOPERS_SKILL = "INSERT INTO developers_skill (developer_id,skill_id) VALUES(?,?);";
-    private final String GET_SKILL = "SELECT * FROM skill WHERE id_skill=?";
-    private final String UPDATE_SKILL = "UPDATE skill SET language=?,level_skill=? WHERE id_skill=?;";
-    private final String DELETE_SKILL = "DELETE FROM skill WHERE id_skill=?;";
-    private final String DELETE_DEVELOPER_SKILL = "DELETE FROM developers_skill WHERE developer_id=? AND skill_id=?;";
 
-    public SkillsService() {
-        this.skillCommand = new SkillCommand();
-        this.converterSkill = new ConverterSkill();
-        this.dbHelper = new DbHelper();
+public class SkillsService {
+
+    private final SkillBase skillsBase;
+
+    public SkillsService(SkillBase skillsBase) {
+        this.skillsBase = skillsBase;
     }
 
     public List<SkillDto> getAll() {
-        List<SkillDao> all = skillCommand.getAll();
-        return all.stream().map(dao -> converterSkill.from(dao)).collect(Collectors.toList());
+        ConverterSkill converterSkill = new ConverterSkill();
+        List<SkillDao> all = skillsBase.getAll();
+        return all.stream().map(s -> converterSkill.from(s)).collect(Collectors.toList());
     }
 
-    public Integer save(SkillDto dto) {
-        SkillDao dao = converterSkill.to(dto);
-        return dbHelper.getWithPreparedStatementWithId(SAVE_SKILL, ps -> {
-            try {
-                ps.setString(1, dao.getLanguage());
-                ps.setString(2, dao.getLevel_skill());
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        });
+    public Optional<SkillDao> get(int id) {
+        return skillsBase.get(id);
     }
 
-    public int saveDevelopersSkill(Integer idDev, Integer idSkill) {
-        return dbHelper.executeWithPreparedStatement(SAVE_DEVELOPERS_SKILL, ps -> {
-            try {
-                ps.setInt(1, idDev);
-                ps.setInt(2, idSkill);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        });
+    public void update(SkillDao skills) {
+        skillsBase.update(skills);
     }
 
-    public Integer update(SkillDto dto) {
-        SkillDao dao = converterSkill.to(dto);
-        return dbHelper.getWithPreparedStatementWithId(UPDATE_SKILL, ps -> {
+    public void create(SkillDao skills, DeveloperDao developer) {
 
-            try {
-                ps.setString(1, dao.getLanguage());
-                ps.setString(2, dao.getLevel_skill());
-                ps.setInt(3, dao.getId_skill());
-
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-
-        });
+        List<DeveloperDao> developerDao = new ArrayList<>();
+        developerDao.add(developer);
+        skills.setDevelopers(developerDao);
+        skillsBase.create(skills);
     }
 
-    @SneakyThrows
-    public SkillDto get(int i) {
-        ResultSet withPreparedStatement = dbHelper.getWithPreparedStatement(GET_SKILL, ps -> {
-
-            try {
-                ps.setInt(1, i);
-
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-
-        });
-        while (withPreparedStatement.next()) {
-            SkillDao skillDao = skillCommand.mapToEntity(withPreparedStatement);
-            return converterSkill.from(skillDao);
-        }
-        return null;
+    public void delete(SkillDao skills) {
+        skillsBase.delete(skills);
     }
 
-    public int deleteSkill(String skillId) {
-        int number = Integer.parseInt(skillId);
+    public void updateSkill(SkillDao dao) {
 
-        return dbHelper.executeWithPreparedStatement(DELETE_SKILL, ps -> {
-
-            try {
-                ps.setInt(1, number);
-
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        });
-    }
-
-    public int deleteDeveloperSkill(String developer, String skill) {
-        int developerId = Integer.parseInt(developer);
-        int skillId = Integer.parseInt(skill);
-
-        return dbHelper.executeWithPreparedStatement(DELETE_DEVELOPER_SKILL, ps -> {
-
-            try {
-                ps.setInt(1, developerId);
-                ps.setInt(2, skillId);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        });
+        Optional<SkillDao> skill = skillsBase.get(dao.getId_skill());
+        SkillDao skillDao = skill.get();
+        skillDao.setLevel_skill(dao.getLevel_skill());
+        skillDao.setLanguage(dao.getLanguage());
+        skillsBase.update(skillDao);
     }
 }

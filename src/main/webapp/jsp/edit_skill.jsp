@@ -35,6 +35,7 @@
         <form>
 
 <input type="hidden"  value="<%=skill.getId_skill() %>"   name="skills">
+<input type="hidden"  value="<c:out value="${skills}"/>"   name="back">
 
 
                <div class="form-group row">

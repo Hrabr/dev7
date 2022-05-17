@@ -11,8 +11,8 @@ import java.sql.SQLException;
 @Log4j2
 public class PostgresHikariProvider  {
 
-private HikariDataSource dataSource;
-private PropertiesUtil propertiesUtil;
+private final HikariDataSource dataSource;
+private final PropertiesUtil propertiesUtil;
 
 public PostgresHikariProvider(){
     propertiesUtil=new PropertiesUtil();

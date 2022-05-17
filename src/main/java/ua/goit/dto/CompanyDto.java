@@ -1,19 +1,17 @@
 package ua.goit.dto;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-
+import lombok.*;
 import java.util.List;
 
+@Data
 @Builder
-@Getter
-@Setter
-public class CompaniesDto {
+@AllArgsConstructor
+@NoArgsConstructor
+public class CompanyDto {
     private int id_companies;
     private String name_companies;
     private String country_companies;
-    private List<ProjectsDto> projectsDto;
+    private List<ProjectDto> projectsDto;
 
 
 }

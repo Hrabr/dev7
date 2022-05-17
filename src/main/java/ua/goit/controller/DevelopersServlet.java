@@ -5,42 +5,48 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.SneakyThrows;
-import ua.goit.dao.DevelopersDao;
-import ua.goit.dto.DevelopersDto;
-import ua.goit.service.DevelopersService;
+import ua.goit.dao.DeveloperDao;
+import ua.goit.dto.DeveloperDto;
+import ua.goit.service.DeveloperService;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 @WebServlet("/developers/*")
 public class DevelopersServlet extends HttpServlet {
-    private DevelopersService developersService;
+    private DeveloperService developersService;
     String skills;
 
     @Override
     public void init() throws ServletException {
-        this.developersService = (DevelopersService) getServletContext().getAttribute("developersService");
+        this.developersService = (DeveloperService) getServletContext().getAttribute("developersService");
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        List<DevelopersDto> all = developersService.getAll();
+
+        List<DeveloperDto> all = developersService.getAll();
         req.setAttribute("developers", all);
         skills = req.getParameter("skills");
         String projects = req.getParameter("projects");
         String Edit = req.getParameter("Edit");
         String remove = req.getParameter("Remove");
         String contextPath = req.getRequestURI();
+
         if (contextPath.equals("/developers/New")) {
+
             req.getRequestDispatcher("/jsp/new_developers.jsp").forward(req, resp);
+
         } else if (skills == null && projects == null && Edit == null && remove == null) {
+
             req.getRequestDispatcher("/jsp/developers.jsp").forward(req, resp);
+
         } else if (skills != null) {
 
             int skillsId = Integer.parseInt(skills);
-            for (DevelopersDto list : all) {
+            for (DeveloperDto list : all) {
                 if (skillsId == list.getId_developers()) {
                     req.setAttribute("skillsId", skillsId);
                     req.setAttribute("Skills", list.getSkillDto());
@@ -51,7 +57,7 @@ public class DevelopersServlet extends HttpServlet {
             }
         } else if (projects != null) {
             int projectId = Integer.parseInt(projects);
-            for (DevelopersDto list : all) {
+            for (DeveloperDto list : all) {
                 if (projectId == list.getId_developers()) {
                     req.setAttribute("projectId", projectId);
                     req.setAttribute("Projects", list.getProjectsDto());
@@ -62,50 +68,42 @@ public class DevelopersServlet extends HttpServlet {
             }
         } else if (Edit != null) {
             int editId = Integer.parseInt(Edit);
-            for (DevelopersDto list : all) {
+            for (DeveloperDto list : all) {
                 if (editId == list.getId_developers()) {
                     req.setAttribute("Developers", list);
                     req.getRequestDispatcher("/jsp/edit_developers.jsp").forward(req, resp);
                 }
             }
         } else if (contextPath.equals("/developers/remove")) {
-            developersService.deleteDeveloper(remove);
-            List<DevelopersDto> allDeveloperDto = developersService.getAll();
+
+            final Optional<DeveloperDao> developersDao = developersService.get(Integer.parseInt(remove));
+            developersDao.ifPresent(dao -> developersService.delete(dao));
+            List<DeveloperDto> allDeveloperDto = developersService.getAll();
             req.setAttribute("developers", allDeveloperDto);
             req.getRequestDispatcher("/jsp/developers.jsp").forward(req, resp);
         }
     }
 
 
-    @SneakyThrows
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
-        DevelopersDao developersDao = DevelopersDao.builder()
+        DeveloperDao developersDao = DeveloperDao.builder()
                 .name(req.getParameter("Name"))
                 .age(Integer.parseInt(req.getParameter("Age"))).gender(req.getParameter("Gender"))
-                .salary(new BigDecimal(req.getParameter("Salary"))).build();
+                .salary(new BigDecimal(req.getParameter("Salary")))
+                .build();
+
         String requestURI = req.getRequestURI();
         if (requestURI.equals("/developers/New")) {
 
-            Integer save = developersService.save(developersDao);
-            if (save != null) {
-                req.setAttribute("Save", "Developer saved");
-            } else {
-                req.setAttribute("Save", "Developer not save");
-            }
-            req.getRequestDispatcher("/jsp/new_developers.jsp").forward(req, resp);
+            developersService.create(developersDao);
+
         } else {
+
             developersDao.setId_developers(Integer.parseInt(req.getParameter("developersId")));
-            int update = developersService.update(developersDao);
-            if (update != 0) {
-                DevelopersDto dto = developersService.get(update);
-                req.setAttribute("Developers", dto);
-                req.setAttribute("Save", "Developer edited");
-            } else {
-                req.setAttribute("Save", "Developer not edited");
-            }
-            req.getRequestDispatcher("/jsp/edit_developers.jsp").forward(req, resp);
+            developersService.updateDevelopers(developersDao);
         }
+        resp.sendRedirect("/developers");
+
     }
 }

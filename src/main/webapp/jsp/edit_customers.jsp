@@ -8,7 +8,7 @@
 <body>
 
 <jsp:include page = "navigators.jsp"/>
-<% ua.goit.dto.CustomersDto  customers = (ua.goit.dto.CustomersDto) request.getAttribute("customer");%>
+<% ua.goit.dto.CustomerDto  customers = (ua.goit.dto.CustomerDto) request.getAttribute("customer");%>
 <div class="container">
     <form action="/customers" method="post">
         <div style="margin: 10px">

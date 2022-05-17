@@ -5,53 +5,61 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import ua.goit.dto.CustomersDto;
-import ua.goit.dto.ProjectsDto;
-import ua.goit.service.CustomersService;
+import ua.goit.base_service.ProjectBase;
+import ua.goit.dao.CustomerDao;
+import ua.goit.dao.ProjectDao;
+import ua.goit.dto.CustomerDto;
+import ua.goit.dto.ProjectDto;
+import ua.goit.service.CustomerService;
+import ua.goit.service.ProjectService;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @WebServlet("/customers/*")
 public class CustomersServlet extends HttpServlet {
 
-    private CustomersService customersService;
+    private CustomerService customersService;
 
     @Override
     public void init() throws ServletException {
-        this.customersService = (CustomersService) getServletContext().getAttribute("customersService");
+        this.customersService = (CustomerService) getServletContext().getAttribute("customersService");
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        List<CustomersDto> all = customersService.getAll();
+
+        final ProjectService projectsService = new ProjectService(new ProjectBase());
+        List<CustomerDto> all = customersService.getAll();
         req.setAttribute("Customers", all);
         String projects = req.getParameter("projects");
         String requestURI = req.getRequestURI();
         String remove = req.getParameter("remove");
         String edit = req.getParameter("edit");
+
         if (requestURI.equals("/customers/remove")) {
             String id = req.getParameter("id");
             String back = req.getParameter("back");
-            int integer = Integer.parseInt(id);
-            customersService.saveNullProject(integer);
+            int idProject = Integer.parseInt(id);
+            customersService.updateNullProject(idProject);
             req.getRequestDispatcher("/customers?projects=" + back).forward(req, resp);
         } else if (requestURI.equals("/customers/New")) {
             req.getRequestDispatcher("/jsp/new_customers.jsp").forward(req, resp);
         } else if (requestURI.equals("/customers/Back")) {
-            List<ProjectsDto> project = customersService.getProject();
+            final List<ProjectDto> projectsWithNullableCustomer = projectsService.getProjectsWithNullableCustomer();
+
             String aNew = req.getParameter("new");
-            req.setAttribute("Projects", project);
+            req.setAttribute("Projects", projectsWithNullableCustomer);
             req.setAttribute("Back", aNew);
             req.getRequestDispatcher("/jsp/customer_new_projects.jsp").forward(req, resp);
         } else if (projects == null && remove == null && edit == null) {
             req.getRequestDispatcher("/jsp/customers.jsp").forward(req, resp);
         } else if (projects != null && remove == null) {
             int projectBack = Integer.parseInt(projects);
-            for (CustomersDto cuD : all) {
+            for (CustomerDto cuD : all) {
                 if (projectBack == cuD.getId_customers()) {
                     req.setAttribute("Projects", cuD.getProjectsDto());
                     req.setAttribute("Name", cuD.getName_customers());
@@ -60,12 +68,14 @@ public class CustomersServlet extends HttpServlet {
                 }
             }
         } else if (remove != null) {
-            customersService.remove(remove);
-            List<CustomersDto> allCustomersDto = customersService.getAll();
-            req.setAttribute("Customers", allCustomersDto);
-            req.getRequestDispatcher("/jsp/customers.jsp").forward(req, resp);
+            int removeCustomer = Integer.parseInt(remove);
+            Optional<CustomerDao> customerDao = customersService.get(removeCustomer);
+            CustomerDao customerDao1 = customerDao.get();
+            customersService.delete(customerDao1);
+            resp.sendRedirect("/customers");
+
         } else if (edit != null) {
-            for (CustomersDto dto : all) {
+            for (CustomerDto dto : all) {
                 int integer = Integer.valueOf(edit);
                 if (integer == dto.getId_customers()) {
                     req.setAttribute("customer", dto);
@@ -77,49 +87,56 @@ public class CustomersServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        final ProjectService projectsService = new ProjectService(new ProjectBase());
         String customerId1 = req.getParameter("CustomerId");
         String customerId2 = req.getParameter("customerId");
         String projectIds = req.getParameter("projectId");
-        CustomersDto build = CustomersDto.builder().name_customers(req.getParameter("Name_customer"))
-                .country_customers(req.getParameter("Country_customer")).build();
+        CustomerDao build = CustomerDao.builder()
+                .name_customers(req.getParameter("Name_customer"))
+                .country_customers(req.getParameter("Country_customer"))
+                .build();
         if (build != null && customerId2 == null && projectIds == null) {
-            int save = customersService.save(build);
-            if (save != 0) {
-                req.setAttribute("Save", "Customer save");
-                req.getRequestDispatcher("/jsp/new_customers.jsp").forward(req, resp);
-            } else {
-                req.setAttribute("Save", "Customer not save");
-                req.getRequestDispatcher("/jsp/new_customers.jsp").forward(req, resp);
-            }
+
+            customersService.create(build);
+            resp.sendRedirect("/customers");
 
         } else if (projectIds == null && build == null) {
-            List<ProjectsDto> project = customersService.getProject();
+
+            List<ProjectDto> project = projectsService.getProjectsWithNullableCustomer();
             req.setAttribute("Projects", project);
             req.setAttribute("Back", customerId1);
             req.getRequestDispatcher("/jsp/customer_new_projects.jsp").forward(req, resp);
+
         } else if (customerId2 != null) {
             assert build != null;
-            build.setId_customers(Integer.parseInt(customerId2));
-            int update = customersService.update(build);
-            if (update != 0) {
-                CustomersDto dto = customersService.get(update);
-                req.setAttribute("customer", dto);
-                req.setAttribute("Save", "Customer edited");
-            } else {
-                req.setAttribute("Save", "Customer not edited");
-            }
-            req.getRequestDispatcher("/jsp/edit_customers.jsp").forward(req, resp);
+            build.setId(Integer.parseInt(customerId2));
+            customersService.updateCustomer(build);
+            resp.sendRedirect("/customers");
 
         } else {
             Integer customerId = Integer.parseInt(customerId1);
-            Set<Integer> projectId = Arrays.stream(req.getParameterValues("projectId"))
+            Optional<CustomerDao> customerDao = customersService.get(customerId);
+            CustomerDao customerDao1 = customerDao.get();
+
+            List<Integer> projectId = Arrays.stream(req.getParameterValues("projectId"))
                     .map(Integer::parseInt)
-                    .collect(Collectors.toSet());
-            projectId.stream().forEach(p -> customersService.saveCustomersProject(p, customerId));
-            List<ProjectsDto> project = customersService.getProject();
-            req.setAttribute("Projects", project);
-            req.setAttribute("Back", customerId1);
-            req.getRequestDispatcher("/jsp/customer_new_projects.jsp").forward(req, resp);
+                    .collect(Collectors.toList());
+
+            List<Optional<ProjectDao>> collect = projectId.stream()
+                    .map(p -> projectsService.get(p))
+                    .collect(Collectors.toList());
+
+            List<ProjectDao> projectsDaoStream = collect.stream()
+                    .map(p -> p.get())
+                    .collect(Collectors.toList());
+
+            projectsDaoStream.forEach(c -> {
+                c.setCustomer(customerDao1);
+                projectsService.update(c);
+            });
+            resp.sendRedirect("/customers?projects=" + customerId1);
+
         }
     }
 

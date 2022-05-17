@@ -9,7 +9,7 @@
 
 <jsp:include page = "navigators.jsp"/>
 
-<% ua.goit.dto.ProjectsDto  project = (ua.goit.dto.ProjectsDto) request.getAttribute("ProjectDto");
+<% ua.goit.dto.ProjectDto  project = (ua.goit.dto.ProjectDto) request.getAttribute("ProjectDto");
 
 %>
 
@@ -37,7 +37,7 @@
         <form>
 
 <input type="hidden"  value="<%=project.getId_projects() %>"   name="project">
-
+<input type="hidden"  value="<c:out value="${proj}"/>"   name="In">
  <div class="form-group row">
             <label for="Name" class="col-sm-2 col-form-label">Name</label>
             <div class="col-sm-10">

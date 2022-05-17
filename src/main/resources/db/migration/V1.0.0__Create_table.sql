@@ -12,24 +12,24 @@ CREATE TABLE skill(
 	level_skill varchar(100) NOT NULL
 );
 CREATE TABLE companies(
-	id_companies serial PRIMARY KEY,
+	id serial PRIMARY KEY,
 	name_companies varchar(100) NOT NULL,
 	country_companies varchar(100) NOT NULL
 );
 CREATE TABLE customers(
-	id_customers serial PRIMARY KEY,
+	id serial PRIMARY KEY,
 	name_customers varchar(100) NOT NULL,
 	country_customers varchar(100) NOT NULL
 );
 CREATE TABLE projects(
 	id_projects serial PRIMARY KEY,
 	name_projects varchar(100) NOT NULL,
-	companies_id int ,
-	customers_id int ,
+	company_id int ,
+	customer_id int ,
 	start_project date ,
 	cost_project decimal(15,0) NOT NULL,
-	FOREIGN KEY (companies_id) REFERENCES companies(id_companies) ON DELETE SET NULL,
-	FOREIGN KEY (customers_id) REFERENCES customers(id_customers) ON DELETE SET NULL
+	FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE SET NULL,
+	FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE SET NULL
 );
 CREATE TABLE developers_projects(
 	developer_id int ,
